@@ -27,7 +27,10 @@ class InstallCommand extends Command
 
         $output->writeln("<info>🚀 Installing Panelix Dashboard into {$directory}...</info>");
 
-        $process = Process::fromShellCommandline("git clone https://github.com/anikrahman0/Panelix {$directory}");
+        $process = $process = Process::fromShellCommandline(
+            "git clone --depth 1 https://github.com/anikrahman0/Panelix {$directory} && rd /s /q {$directory}\\.git"
+        );
+
         $process->setTimeout(null);
         $process->run(function ($type, $buffer) use ($output) {
             $output->write($buffer);
