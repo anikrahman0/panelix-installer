@@ -10,24 +10,23 @@ use Symfony\Component\Process\Process;
 
 class InstallCommand extends Command
 {
-    protected static $defaultName = 'new';
+    // Remove static $defaultName
+    // protected static $defaultName = 'new';
 
-    // Configure method should have : void return type
     protected function configure(): void
     {
         $this
+            ->setName('new') // <-- Explicitly set the command name
             ->setDescription('Create a new Panelix Laravel 12 project')
             ->addArgument('name', InputArgument::OPTIONAL, 'The directory name for the new project', 'panelix-app');
     }
 
-    // Execute method must return int
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $directory = $input->getArgument('name');
 
         $output->writeln("<info>🚀 Installing Panelix Dashboard into {$directory}...</info>");
 
-        // Clone from GitHub repo
         $process = Process::fromShellCommandline("git clone https://github.com/anikrahman0/Panelix {$directory}");
         $process->setTimeout(null);
         $process->run(function ($type, $buffer) use ($output) {
@@ -36,7 +35,7 @@ class InstallCommand extends Command
 
         if (!$process->isSuccessful()) {
             $output->writeln('<error>Failed to clone Panelix repository</error>');
-            return Command::FAILURE; // return int
+            return Command::FAILURE;
         }
 
         $output->writeln("<info>✅ Panelix Project is ready in ./$directory</info>");
@@ -49,6 +48,6 @@ class InstallCommand extends Command
         $output->writeln('php artisan migrate --seed');
         $output->writeln('php artisan serve');
 
-        return Command::SUCCESS; // return int
+        return Command::SUCCESS;
     }
 }
