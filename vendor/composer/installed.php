@@ -3,7 +3,7 @@
         'name' => 'panelix/installer',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'f5815fc242c0f268ea73075fd59f5b37e81b21a7',
+        'reference' => 'c8efa290d774a830247e7474762a0c6a25040399',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'panelix/installer' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'f5815fc242c0f268ea73075fd59f5b37e81b21a7',
+            'reference' => 'c8efa290d774a830247e7474762a0c6a25040399',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
