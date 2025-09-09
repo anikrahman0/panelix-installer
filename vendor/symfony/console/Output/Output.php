@@ -17,13 +17,14 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 /**
  * Base class for output classes.
  *
- * There are five levels of verbosity:
+ * There are six levels of verbosity:
  *
  *  * normal: no option passed (normal output)
  *  * verbose: -v (more output)
  *  * very verbose: -vv (highly extended output)
  *  * debug: -vvv (all debug output)
- *  * quiet: -q (no output)
+ *  * quiet: -q (only output errors)
+ *  * silent: --silent (no output)
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -37,7 +38,7 @@ abstract class Output implements OutputInterface
      * @param bool                          $decorated Whether to decorate messages
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      */
-    public function __construct(?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, OutputFormatterInterface $formatter = null)
+    public function __construct(?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, ?OutputFormatterInterface $formatter = null)
     {
         $this->verbosity = $verbosity ?? self::VERBOSITY_NORMAL;
         $this->formatter = $formatter ?? new OutputFormatter();
@@ -72,6 +73,11 @@ abstract class Output implements OutputInterface
     public function getVerbosity(): int
     {
         return $this->verbosity;
+    }
+
+    public function isSilent(): bool
+    {
+        return self::VERBOSITY_SILENT === $this->verbosity;
     }
 
     public function isQuiet(): bool

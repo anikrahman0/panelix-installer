@@ -15,24 +15,15 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @author marie <marie@users.noreply.github.com>
- */
-final class ConsoleSignalEvent extends ConsoleEvent
+final class ConsoleAlarmEvent extends ConsoleEvent
 {
     public function __construct(
         Command $command,
         InputInterface $input,
         OutputInterface $output,
-        private int $handlingSignal,
         private int|false $exitCode = 0,
     ) {
         parent::__construct($command, $input, $output);
-    }
-
-    public function getHandlingSignal(): int
-    {
-        return $this->handlingSignal;
     }
 
     public function setExitCode(int $exitCode): void
