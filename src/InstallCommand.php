@@ -42,7 +42,7 @@ class InstallCommand extends Command
         $output->writeln('');
         $output->writeln('<comment>Next steps:</comment>');
         $output->writeln("cd {$directory}");
-        $output->writeln('composer install');
+        $output->writeln('composer install --no-scripts');
         $output->writeln('cp .env.example .env');
         $output->writeln('php artisan key:generate');
         $output->writeln('php artisan migrate --seed');
