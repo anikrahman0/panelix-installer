@@ -115,7 +115,7 @@ class InstallCommand extends Command
             $output->writeln('');
             $output->writeln('<comment>⚠️ You are serving Panelix on a custom domain or port.</comment>');
             $output->writeln('<comment>➡️ Update the CDN_URL in your .env to match your domain, e.g.:</comment>');
-            $output->writeln('<comment>   CDN_URL=https://xyz.test</comment>');
+            $output->writeln('<comment>   CDN_URL=http://xyz.test</comment>');
         }
 
         return Command::SUCCESS;
