@@ -10,6 +10,8 @@ use Symfony\Component\Process\Process;
 
 class InstallCommand extends Command
 {
+    private bool $dbCreated = false; // track DB creation
+
     protected function configure(): void
     {
         $this
@@ -50,12 +52,13 @@ class InstallCommand extends Command
             $createDb->run();
 
             if ($createDb->isSuccessful()) {
+                $this->dbCreated = true;
                 $output->writeln('<info>✅ Database "panelix_db" created or already exists.</info>');
             } else {
-                $output->writeln('<comment>⚠️ Could not create database automatically. Please create it manually.</comment>');
+                $output->writeln('<comment>⚠️ Could not create database automatically. You may need to create it manually later.</comment>');
             }
         } else {
-            $output->writeln('<comment>⚠️ MySQL not detected on this system. Please install MySQL and create "panelix_db" manually.</comment>');
+            $output->writeln('<comment>⚠️ MySQL not detected. Please install MySQL and create "panelix_db" manually.</comment>');
         }
 
         // Step 3: Update .env file with DB credentials
@@ -75,13 +78,15 @@ class InstallCommand extends Command
             $output->write($buffer);
         });
 
-        // Step 5: Run migrations + seed (will fail gracefully if DB not ready)
-        $output->writeln("<info>📂 Running migrations and seeders...</info>");
-        $artisan = Process::fromShellCommandline("cd {$directory} && php artisan migrate --seed");
-        $artisan->setTimeout(null);
-        $artisan->run(function ($type, $buffer) use ($output) {
-            $output->write($buffer);
-        });
+        // Step 5: Run migrations + seed (only if DB was created successfully)
+        if ($this->dbCreated) {
+            $output->writeln("<info>📂 Running migrations and seeders...</info>");
+            $artisan = Process::fromShellCommandline("cd {$directory} && php artisan migrate --seed");
+            $artisan->setTimeout(null);
+            $artisan->run(function ($type, $buffer) use ($output) {
+                $output->write($buffer);
+            });
+        }
 
         // Step 6: Start Laravel server
         $output->writeln("<info>🚀 Starting Laravel development server...</info>");
@@ -89,10 +94,19 @@ class InstallCommand extends Command
         $serve->setTimeout(null);
         $serve->start();
 
+        // Final instructions
         $output->writeln("<info>✅ Panelix Project is ready!</info>");
         $output->writeln("👉 Serving at: http://127.0.0.1:8000");
         $output->writeln("👉 Project directory: {$directory}");
-        $output->writeln("👉 If DB was not created, please run: CREATE DATABASE panelix_db;");
+
+        if (!$this->dbCreated) {
+            $output->writeln('');
+            $output->writeln('<comment>⚠️ Database was not created automatically.</comment>');
+            $output->writeln('<comment>➡️ Please create it manually: CREATE DATABASE panelix_db;</comment>');
+            $output->writeln('<comment>   (You can also use phpMyAdmin or any MySQL management tool)</comment>');
+            $output->writeln('<comment>➡️ Then run: php artisan migrate --seed</comment>');
+        }
+
 
         return Command::SUCCESS;
     }
