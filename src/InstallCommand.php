@@ -111,12 +111,10 @@ class InstallCommand extends Command
         }
 
         // Step 8: CDN_URL instructions if custom domain or port
-        if ($host !== '127.0.0.1' || $port !== 8000) {
-            $output->writeln('');
-            $output->writeln('<comment>⚠️ You are serving Panelix on a custom domain or port.</comment>');
-            $output->writeln('<comment>➡️ Update the CDN_URL in your .env to match your domain, e.g.:</comment>');
-            $output->writeln('<comment>   CDN_URL=http://xyz.test</comment>');
-        }
+        $output->writeln('');
+        $output->writeln('<comment>⚠️ You are serving Panelix on a custom domain or port.</comment>');
+        $output->writeln('<comment>➡️ Update the CDN_URL in your .env to match your domain, e.g.:</comment>');
+        $output->writeln('<comment>   CDN_URL=http://xyz.test</comment>');
 
         return Command::SUCCESS;
     }
