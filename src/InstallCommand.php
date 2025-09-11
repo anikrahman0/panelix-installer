@@ -34,18 +34,28 @@ class InstallCommand extends Command
         });
 
         if (!$process->isSuccessful()) {
-            $output->writeln('<error>Failed to clone Panelix repository</error>');
+            $output->writeln('<error>❌ Failed to clone Panelix repository</error>');
             return Command::FAILURE;
         }
 
-        // Step 2: Create database
-        $output->writeln("<info>📦 Creating database: panelix_db...</info>");
-        $createDb = Process::fromShellCommandline('mysql -u root -e "CREATE DATABASE IF NOT EXISTS panelix_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"');
-        $createDb->run();
+        // Step 2: Try to create database (skip on failure)
+        $output->writeln("<info>📦 Attempting to create database: panelix_db...</info>");
+        $checkMysql = new Process(['mysql', '--version']);
+        $checkMysql->run();
 
-        if (!$createDb->isSuccessful()) {
-            $output->writeln('<error>❌ Failed to create database. Please check MySQL credentials.</error>');
-            return Command::FAILURE;
+        if ($checkMysql->isSuccessful()) {
+            $createDb = Process::fromShellCommandline(
+                'mysql -u root -e "CREATE DATABASE IF NOT EXISTS panelix_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"'
+            );
+            $createDb->run();
+
+            if ($createDb->isSuccessful()) {
+                $output->writeln('<info>✅ Database "panelix_db" created or already exists.</info>');
+            } else {
+                $output->writeln('<comment>⚠️ Could not create database automatically. Please create it manually.</comment>');
+            }
+        } else {
+            $output->writeln('<comment>⚠️ MySQL not detected on this system. Please install MySQL and create "panelix_db" manually.</comment>');
         }
 
         // Step 3: Update .env file with DB credentials
@@ -65,7 +75,8 @@ class InstallCommand extends Command
             $output->write($buffer);
         });
 
-        // Step 5: Run migrations + seed
+        // Step 5: Run migrations + seed (will fail gracefully if DB not ready)
+        $output->writeln("<info>📂 Running migrations and seeders...</info>");
         $artisan = Process::fromShellCommandline("cd {$directory} && php artisan migrate --seed");
         $artisan->setTimeout(null);
         $artisan->run(function ($type, $buffer) use ($output) {
@@ -81,6 +92,7 @@ class InstallCommand extends Command
         $output->writeln("<info>✅ Panelix Project is ready!</info>");
         $output->writeln("👉 Serving at: http://127.0.0.1:8000");
         $output->writeln("👉 Project directory: {$directory}");
+        $output->writeln("👉 If DB was not created, please run: CREATE DATABASE panelix_db;");
 
         return Command::SUCCESS;
     }
