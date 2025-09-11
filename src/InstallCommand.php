@@ -89,16 +89,19 @@ class InstallCommand extends Command
         }
 
         // Step 6: Start Laravel server
+        $host = '127.0.0.1';
+        $port = 8000;
         $output->writeln("<info>🚀 Starting Laravel development server...</info>");
-        $serve = new Process(["php", "artisan", "serve"], $directory);
+        $serve = new Process(["php", "artisan", "serve", "--host={$host}", "--port={$port}"], $directory);
         $serve->setTimeout(null);
         $serve->start();
 
         // Final instructions
         $output->writeln("<info>✅ Panelix Project is ready!</info>");
-        $output->writeln("👉 Serving at: http://127.0.0.1:8000");
+        $output->writeln("👉 Serving at: http://{$host}:{$port}");
         $output->writeln("👉 Project directory: {$directory}");
 
+        // Step 7: Database instructions if not created
         if (!$this->dbCreated) {
             $output->writeln('');
             $output->writeln('<comment>⚠️ Database was not created automatically.</comment>');
@@ -107,6 +110,13 @@ class InstallCommand extends Command
             $output->writeln('<comment>➡️ Then run: php artisan migrate --seed</comment>');
         }
 
+        // Step 8: CDN_URL instructions if custom domain or port
+        if ($host !== '127.0.0.1' || $port !== 8000) {
+            $output->writeln('');
+            $output->writeln('<comment>⚠️ You are serving Panelix on a custom domain or port.</comment>');
+            $output->writeln('<comment>➡️ Update the CDN_URL in your .env to match your domain, e.g.:</comment>');
+            $output->writeln('<comment>   CDN_URL=https://xyz.test</comment>');
+        }
 
         return Command::SUCCESS;
     }
