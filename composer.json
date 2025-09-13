@@ -16,6 +16,11 @@
             "Panelix\\Installer\\": "src/"
         }
     },
+    "archive": {
+        "exclude": [
+            "README.md"
+        ]
+    },
     "minimum-stability": "stable",
     "prefer-stable": true
 }
